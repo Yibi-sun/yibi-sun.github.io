@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>春节拼图挑战赛 - 新春特别活动</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="description" content="春节拼图挑战赛，快来挑战你的手速和眼力，赢取新春好礼！">
+    <!-- 微信分享配置 -->
+    <meta property="og:title" content="春节拼图挑战赛">
+    <meta property="og:description" content="三关拼图，120秒限时挑战，快来争夺排行榜第一名！">
+    <meta property="og:image" content="share.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+</head>
+<body>
+    <!-- 启动页面 -->
+    <div id="start-screen" class="screen active">
+        <div class="container">
+            <div class="festival-header">
+                <div class="lantern left"><i class="fas fa-gift"></i></div>
+                <h1><i class="fas fa-puzzle-piece"></i> 春节拼图挑战赛</h1>
+                <div class="lantern right"><i class="fas fa-gift"></i></div>
+            </div>
+            
+            <div class="festival-subtitle">
+                <p><i class="fas fa-fireworks"></i> 新春特别活动 <i class="fas fa-fireworks"></i></p>
+            </div>
+            
+            <div class="game-rules">
+                <h2><i class="fas fa-info-circle"></i> 游戏规则</h2>
+                <ul>
+                    <li><i class="fas fa-flag"></i> <strong>三关挑战：</strong>4×4 → 6×6 → 8×8</li>
+                    <li><i class="fas fa-clock"></i> <strong>时间限制：</strong>每关120秒</li>
+                    <li><i class="fas fa-trophy"></i> <strong>排名规则：</strong>按三关总用时排名</li>
+                    <li><i class="fas fa-star"></i> <strong>奖励：</strong>前10名获得新春大礼包</li>
+                </ul>
+            </div>
+            
+            <div class="start-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="player-name" placeholder="请输入您的昵称（用于排行榜显示）" maxlength="10">
+                </div>
+                
+                <button id="start-btn" class="btn-start">
+                    <i class="fas fa-play-circle"></i> 开始挑战
+                </button>
+                
+                <button id="view-rank-btn" class="btn-secondary">
+                    <i class="fas fa-list-ol"></i> 查看排行榜
+                </button>
+            </div>
+            
+            <div class="festival-footer">
+                <p><i class="fas fa-gift"></i> 活动时间：即日起至除夕前</p>
+                <p><i class="fas fa-award"></i> 奖品将在春节后统一发放</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 游戏主界面 -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="level-info">
+                <h2>第 <span id="current-level">1</span> 关</h2>
+                <p>难度：<span id="grid-size">4×4</span></p>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span id="time">120</span>秒
+                </div>
+                <div class="progress-bar">
+                    <div id="time-progress" class="progress"></div>
+                </div>
+            </div>
+            
+            <div class="score-info">
+                <p>当前用时：<span id="current-time">0</span>秒</p>
+                <p>总用时：<span id="total-time">0</span>秒</p>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <div id="puzzle-container"></div>
+            
+            <div class="controls">
+                <!-- 原图参考部分 - 修改后确保显示 -->
+                <div class="original-image" style="display: block; background: white; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                    <h3 style="color: #ff9800; text-align: center; margin-bottom: 15px;">
+                        <i class="fas fa-eye"></i> 原图参考
+                    </h3>
+                    <img id="original-img" 
+                         src="" 
+                         alt="拼图参考图" 
+                         style="width: 100%; 
+                                height: auto; 
+                                max-width: 300px; 
+                                display: block; 
+                                margin: 0 auto;
+                                border: 3px solid #ff9800;
+                                border-radius: 8px;
+                                box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="hint-btn" class="btn-control">
+                        <i class="fas fa-lightbulb"></i> 提示 (剩余: <span id="hint-count">3</span>)
+                    </button>
+                    <button id="restart-btn" class="btn-control">
+                        <i class="fas fa-redo"></i> 重新开始
+                    </button>
+                    <button id="quit-btn" class="btn-control">
+                        <i class="fas fa-sign-out-alt"></i> 退出挑战
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 关卡完成界面 -->
+    <div id="level-complete-screen" class="screen">
+        <div class="complete-container">
+            <div class="celebration">
+                <i class="fas fa-trophy trophy-icon"></i>
+                <h1>恭喜通关！</h1>
+                <p class="subtitle">第 <span id="complete-level">1</span> 关挑战成功</p>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <i class="fas fa-clock"></i>
+                    <h3>本关用时</h3>
+                    <p class="stat-value" id="level-time">0</p>
+                    <p class="stat-unit">秒</p>
+                </div>
+                
+                <div class="stat-box">
+                    <i class="fas fa-list-ol"></i>
+                    <h3>当前排名</h3>
+                    <p class="stat-value" id="temp-rank">-</p>
+                    <p class="stat-unit">名</p>
+                </div>
+                
+                <div class="stat-box">
+                    <i class="fas fa-star"></i>
+                    <h3>累计用时</h3>
+                    <p class="stat-value" id="cumulative-time">0</p>
+                    <p class="stat-unit">秒</p>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="next-level-btn" class="btn-next">
+                    <i class="fas fa-arrow-right"></i> 下一关挑战
+                </button>
+                <button id="view-rank-btn2" class="btn-secondary">
+                    <i class="fas fa-list-ol"></i> 查看排行榜
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 游戏结束界面 -->
+    <div id="game-over-screen" class="screen">
+        <div class="gameover-container">
+            <div class="gameover-header">
+                <i class="fas fa-hourglass-end"></i>
+                <h1>时间到！</h1>
+                <p>很遗憾，本关挑战失败</p>
+            </div>
+            
+            <div class="gameover-stats">
+                <p>您已完成的关卡：<span id="completed-levels">0</span>关</p>
+                <p>最佳成绩：<span id="best-time">0</span>秒</p>
+            </div>
+            
+            <div class="gameover-actions">
+                <button id="restart-game-btn" class="btn-restart">
+                    <i class="fas fa-redo"></i> 重新开始挑战
+                </button>
+                <button id="back-to-home-btn" class="btn-secondary">
+                    <i class="fas fa-home"></i> 返回首页
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 最终完成界面 -->
+    <div id="final-complete-screen" class="screen">
+        <div class="final-container">
+            <div class="final-celebration">
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                <div class="confetti"></div>
+                
+                <i class="fas fa-crown crown-icon"></i>
+                <h1>恭喜完成全部挑战！</h1>
+                <p class="subtitle">您是真正的拼图大师</p>
+            </div>
+            
+            <div class="final-stats">
+                <div class="final-stat">
+                    <h3><i class="fas fa-tachometer-alt"></i> 总用时</h3>
+                    <p class="final-value" id="final-total-time">0</p>
+                    <p class="final-label">秒</p>
+                </div>
+                
+                <div class="final-stat">
+                    <h3><i class="fas fa-medal"></i> 预估排名</h3>
+                    <p class="final-value" id="estimated-rank">-</p>
+                    <p class="final-label">名</p>
+                </div>
+                
+                <div class="share-section">
+                    <h3><i class="fas fa-share-alt"></i> 分享战绩</h3>
+                    <div class="share-buttons">
+                        <button id="share-wechat" class="share-btn">
+                            <i class="fab fa-weixin"></i> 微信好友
+                        </button>
+                        <button id="share-moment" class="share-btn">
+                            <i class="fab fa-weixin"></i> 朋友圈
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="final-actions">
+                <button id="submit-score-btn" class="btn-submit">
+                    <i class="fas fa-flag-checkered"></i> 提交成绩
+                </button>
+                <button id="play-again-btn" class="btn-secondary">
+                    <i class="fas fa-play-circle"></i> 再玩一次
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 排行榜界面 -->
+    <div id="rank-screen" class="screen">
+        <div class="rank-container">
+            <div class="rank-header">
+                <h1><i class="fas fa-trophy"></i> 排行榜</h1>
+                <p>春节拼图挑战赛TOP20</p>
+            </div>
+            
+            <div class="rank-tabs">
+                <button class="rank-tab active" data-tab="today">今日排名</button>
+                <button class="rank-tab" data-tab="total">总排名</button>
+            </div>
+            
+            <div class="rank-list" id="rank-list">
+                <div class="loading-ranks">
+                    <i class="fas fa-spinner fa-spin"></i> 加载排行榜中...
+                </div>
+            </div>
+            
+            <div class="my-rank">
+                <h3><i class="fas fa-user"></i> 我的成绩</h3>
+                <div id="my-rank-info">
+                    <p>您还没有成绩，快去挑战吧！</p>
+                </div>
+            </div>
+            
+            <div class="rank-actions">
+                <button id="back-from-rank-btn" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回游戏
+                </button>
+            </div>
+            
+            <div class="rank-footer">
+                <p><i class="fas fa-info-circle"></i> 排行榜每小时更新一次，最终排名以活动结束为准</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="rank.js"></script>
+</body>
+</html>
